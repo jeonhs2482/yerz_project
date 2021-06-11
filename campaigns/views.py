@@ -9,7 +9,7 @@ from users.models          import User
 class CampaignListView(View):
     #@authorization_decorator
     def get(self, request):
-        user          = User.objects.get(id=6)
+        user          = User.objects.get(id=3)
         user_campaign = UserCampaign.objects.filter(user_id=user.id)
         campaign_info = [{
             'id'   : campaigns.campaign.id,
@@ -18,5 +18,12 @@ class CampaignListView(View):
             'brand': campaigns.campaign.subtitle.brand,
             'title': campaigns.campaign.title
         } for campaigns in user_campaign ]
-        return JsonResponse({'status': "SUCCESS", 'data': {'campaign':campaign_info}}, status=200)         
+        return JsonResponse({'status': "SUCCESS", 'data': {'campaign':campaign_info}}, status=200)       
+
+class CampaignDetailView(View):
+    #@authorization_decorator
+    def get(self, request, id):
+        pass
+
+
         
