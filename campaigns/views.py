@@ -12,14 +12,16 @@ class CampaignListView(View):
     def get(self, request):
         user          = request.user
         user_campaign = UserCampaign.objects.filter(user_id=user.id)
-        campaign_info = [{
-            'id'   : campaigns.campaign.id,
-            'image': campaigns.campaign.image,
-            'host' : campaigns.campaign.subtitle.host,
-            'brand': campaigns.campaign.subtitle.brand,
-            'title': campaigns.campaign.title
+        campaign = [{
+            'id'       : campaigns.campaign.id,
+            'url'      : [campaigns.campaign.image, campaigns.campaign.image, campaigns.campaign.image],
+            'subtitle' : {
+                'brand'   : campaigns.campaign.subtitle.brand,
+                'hostname': campaigns.campaign.subtitle.host
+            },
+            'title'    : campaigns.campaign.title
         } for campaigns in user_campaign ]
-        return JsonResponse({'status': "SUCCESS", 'data': {'campaign':campaign_info}}, status=200)       
+        return JsonResponse({'status': "SUCCESS", 'data': {'campaign':campaign}}, status=200)       
 
 class CampaignDetailView(View):
     @authorization_decorator
