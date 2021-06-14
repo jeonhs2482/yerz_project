@@ -1,6 +1,6 @@
 import json, time, jwt
 from .models     import User
-from yerz.settings    import JWT_SECRET_KEY, JWT_ALGORITHM, JWT_DURATION_SEC
+from yerz.settings    import SECRET_KEY, JWT_ALGORITHM, JWT_DURATION_SEC
 
 from django.views     import View
 from django.http      import JsonResponse
@@ -21,7 +21,7 @@ class SignInView(View):
                                         'iat'    : int(time.time()),
                                         'exp'    : int(time.time()) + JWT_DURATION_SEC
                                     }, 
-                                    JWT_SECRET_KEY, 
+                                    SECRET_KEY, 
                                     JWT_ALGORITHM
                                   )
 
