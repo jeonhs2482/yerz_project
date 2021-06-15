@@ -1,10 +1,16 @@
 import json, time, jwt
-from .models     import User
-from yerz.settings    import SECRET_KEY, JWT_ALGORITHM, JWT_DURATION_SEC
 
-from django.views     import View
-from django.http      import JsonResponse
-class SignInView(View):
+from django.http             import JsonResponse
+
+from rest_framework.views    import APIView
+from drf_yasg.utils          import swagger_auto_schema 
+
+from .models                 import User
+from yerz.settings           import SECRET_KEY, JWT_ALGORITHM, JWT_DURATION_SEC
+from users.serializers       import UserBodySerializer
+
+class SignInView(APIView):
+    @swagger_auto_schema(request_body=UserBodySerializer)
     def post(self, request):
         try:
             data     = json.loads(request.body)
@@ -32,6 +38,9 @@ class SignInView(View):
         
         except User.DoesNotExist: 
             return JsonResponse({"status": "INVALID_USER"}, status=401)
+        
+
+        
         
 
 
