@@ -1,6 +1,3 @@
-import json
-
-from django.views          import View
 from django.http           import JsonResponse
 
 from drf_yasg              import openapi
@@ -8,7 +5,7 @@ from drf_yasg.utils        import swagger_auto_schema
 from rest_framework.views  import APIView
 
 from utils.decorators      import authorization_decorator
-from users.models          import UserCampaign, UserOption
+from users.models          import UserOption, Payment
 from campaigns.models      import Campaign
 
 class CampaignListView(APIView):
@@ -18,18 +15,18 @@ class CampaignListView(APIView):
     @authorization_decorator
     def get(self, request):
         user          = request.user
-        user_campaign = UserCampaign.objects.filter(user_id=user.id)
-        campaign = [{
-            'id'       : campaigns.campaign.id,
-            'url'      : [campaigns.campaign.image, campaigns.campaign.image, campaigns.campaign.image],
+        user_payment  = Payment.objects.filter(user_id=user.id)
+        campaign      = [{
+            'id'       : payments.campaign.id,
+            'url'      : [payments.campaign.image, payments.campaign.image, payments.campaign.image],
             'subtitle' : {
-                'brand'   : campaigns.campaign.subtitle.brand,
-                'hostname': campaigns.campaign.subtitle.host
+                'brand'   : payments.campaign.subtitle.brand,
+                'hostname': payments.campaign.subtitle.host
             },
-            'title'    : campaigns.campaign.title
-        } for campaigns in user_campaign ]
-        return JsonResponse({'status': "SUCCESS", 'data': {'campaign':campaign}}, status=200)       
-
+            'title'    : payments.campaign.title
+        } for payments in user_payment]
+        return JsonResponse({'status': "SUCCESS", 'data': {'campaign':campaign}}, status=200)
+   
 class CampaignDetailView(APIView):
     @swagger_auto_schema(
         manual_parameters=[openapi.Parameter('authorization', openapi.IN_HEADER, description="please enter login token", type=openapi.TYPE_STRING)]
@@ -40,10 +37,11 @@ class CampaignDetailView(APIView):
             user         = request.user
             campaign     = Campaign.objects.get(id=campaign_id)
             user_options = UserOption.objects.filter(user_id=user.id, option__campaign_id=campaign_id)
+            user_payment = Payment.objects.filter(user_id=user.id, campaign_id=campaign_id)
             option_list  = []
             for user_option in user_options:
                 option_list.append(user_option)
-            all_price    = [options.option.price for options in option_list]
+            all_price    = [options.price for options in option_list]
             detail_info  = {
                 'id': campaign.id,
                 'more': [
@@ -52,27 +50,27 @@ class CampaignDetailView(APIView):
                         'detail': {
                             'campname': campaign.title,
                             'username': user.name,
-                            'date'    : option_list[0].option.payment.created_at.strftime("%Y.%m.%d"),
+                            'date'    : user_payment.first().created_at.strftime("%Y.%m.%d"),
                             'option'  : [{
-                                'title'   : options.option.title,
-                                'quantity': options.option.quantity
+                                'title'   : options.title,
+                                'quantity': options.quantity
                             } for options in option_list]
                         }
                     },
                     {
                         'title' : "결제 정보",
                         'detail': {
-                            'payment': option_list[0].option.payment.payment_type,
+                            'payment': user_payment.first().payment_type,
                             'price'  : float(sum(all_price))
                         }
                     },
                     {
                         'title' : "배송 정보",
                         'detail': {
-                            'recipient': option_list[0].option.payment.name,
-                            'contact'  : option_list[0].option.payment.phone_number,
-                            'address'  : option_list[0].option.payment.address,
-                            'request'  : option_list[0].option.payment.delivery_request
+                            'recipient': user_payment.first().name,
+                            'contact'  : user_payment.first().phone_number,
+                            'address'  : user_payment.first().address,
+                            'request'  : user_payment.first().delivery_request
                         }
                     }
                 ]
