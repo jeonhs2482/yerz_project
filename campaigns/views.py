@@ -59,6 +59,7 @@ class CampaignDetailView(APIView):
                 'option' : [{
                     'option_id': option.id,
                     'title'    : option.title,
+                    'price'    : option.price,
                     'quantity' : 0,
                     'stock'    : 10
                 } for option in campaign_option]
