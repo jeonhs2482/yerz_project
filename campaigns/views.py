@@ -6,7 +6,7 @@ from rest_framework.views  import APIView
 
 from utils.decorators      import authorization_decorator
 from users.models          import UserOption, Payment
-from campaigns.models      import Campaign
+from campaigns.models      import Campaign, Option
 
 class CampaignListView(APIView):
     @swagger_auto_schema(
@@ -28,7 +28,7 @@ class CampaignListView(APIView):
         return JsonResponse({'status': "SUCCESS", 'data': {'campaign':campaign}}, status=200)
 
 class AllCampaignListView(APIView):
-    def get(self, request):
+    def get(self,request):
         all_campaign  = Campaign.objects.all()
         campaign      = [{
             'id'       : campaigns.id,
@@ -40,8 +40,33 @@ class AllCampaignListView(APIView):
             'title'    : campaigns.title
         } for campaigns in all_campaign]
         return JsonResponse({'status': "SUCCESS", 'data': {'campaign':campaign}}, status=200)
-        
+
 class CampaignDetailView(APIView):
+    def get(self, request, campaign_id):
+        campaign        = Campaign.objects.get(id=campaign_id)
+        campaign_option = Option.objects.filter(campaign_id=campaign_id)
+        detail_info = {
+            'result'   : {
+                'id'   : campaign.id,
+                'title': campaign.title,
+                'subtitle' : {
+                    'brand': campaign.subtitle.brand,
+                    'host' : campaign.subtitle.host
+                },
+                'url': [
+                    campaign.image, campaign.image, campaign.image 
+                ],
+                'option' : [{
+                    'option_id': option.id,
+                    'title'    : option.title,
+                    'quantity' : 0,
+                    'stock'    : 10
+                } for option in campaign_option]
+            }
+        }
+        return JsonResponse({'status': "SUCCESS", 'data': {'campaign':detail_info}}, status=200)
+        
+class UserCampaignDetailView(APIView):
     @swagger_auto_schema(
         manual_parameters=[openapi.Parameter('authorization', openapi.IN_HEADER, description="please enter login token", type=openapi.TYPE_STRING)]
     )
