@@ -26,7 +26,21 @@ class CampaignListView(APIView):
             'title'    : payments.campaign.title
         } for payments in user_payment]
         return JsonResponse({'status': "SUCCESS", 'data': {'campaign':campaign}}, status=200)
-   
+
+class AllCampaignListView(APIView):
+    def get(self, request):
+        all_campaign  = Campaign.objects.all()
+        campaign      = [{
+            'id'       : campaigns.id,
+            'url'      : [campaigns.image, campaigns.image, campaigns.image],
+            'subtitle' : {
+                'brand'   : campaigns.subtitle.brand,
+                'hostname': campaigns.subtitle.host
+            },
+            'title'    : campaigns.title
+        } for campaigns in all_campaign]
+        return JsonResponse({'status': "SUCCESS", 'data': {'campaign':campaign}}, status=200)
+        
 class CampaignDetailView(APIView):
     @swagger_auto_schema(
         manual_parameters=[openapi.Parameter('authorization', openapi.IN_HEADER, description="please enter login token", type=openapi.TYPE_STRING)]

@@ -3,7 +3,7 @@ import jwt
 from django.http  import JsonResponse
 
 from users.models import User
-from my_settings  import JWT_SECRET_KEY, JWT_ALGORITHM, SECRET_KEY
+from my_settings  import JWT_ALGORITHM, SECRET_KEY
 
 def authorization_decorator(func):
     def wrapper(self, request, *args, **kwargs):
@@ -20,5 +20,8 @@ def authorization_decorator(func):
 
         except User.DoesNotExist:
             return JsonResponse({'message':'INVALID_USER'},status=400)
+
+        except jwt.exceptions.ExpiredSignatureError:
+            return JsonResponse({'message': 'EXPIRED_TOKEN'},status=400)
 
     return wrapper
