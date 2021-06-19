@@ -17,7 +17,7 @@ class Campaign(models.Model):
 
 class Option(models.Model):
     title    = models.CharField(max_length=64)
-    price    = models.DecimalField(max_digits=10, decimal_places=2)
+    price    = models.IntegerField()
     quantity = models.PositiveSmallIntegerField(default=0)
     campaign = models.ForeignKey('Campaign', on_delete=models.CASCADE)
 

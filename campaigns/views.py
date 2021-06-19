@@ -1,3 +1,5 @@
+import json
+
 from django.http           import JsonResponse
 
 from drf_yasg              import openapi
@@ -43,30 +45,33 @@ class AllCampaignListView(APIView):
 
 class CampaignDetailView(APIView):
     def get(self, request, campaign_id):
-        campaign        = Campaign.objects.get(id=campaign_id)
-        campaign_option = Option.objects.filter(campaign_id=campaign_id)
-        detail_info = {
-            'result'   : {
-                'id'   : campaign.id,
-                'title': campaign.title,
-                'subtitle' : {
-                    'brand': campaign.subtitle.brand,
-                    'host' : campaign.subtitle.host
-                },
-                'url': [
-                    campaign.image, campaign.image, campaign.image 
-                ],
-                'option' : [{
-                    'option_id': option.id,
-                    'title'    : option.title,
-                    'price'    : option.price,
-                    'quantity' : 0,
-                    'stock'    : 10
-                } for option in campaign_option]
+        try:
+            campaign        = Campaign.objects.get(id=campaign_id)
+            campaign_option = Option.objects.filter(campaign_id=campaign_id)
+            detail_info = {
+                'result'   : {
+                    'id'   : campaign.id,
+                    'title': campaign.title,
+                    'subtitle' : {
+                        'brand': campaign.subtitle.brand,
+                        'host' : campaign.subtitle.host
+                    },
+                    'url': [
+                        campaign.image, campaign.image, campaign.image 
+                    ],
+                    'option' : [{
+                        'option_id': option.id,
+                        'title'    : option.title,
+                        'price'    : option.price,
+                        'quantity' : 0,
+                        'stock'    : 10
+                    } for option in campaign_option]
+                }
             }
-        }
-        return JsonResponse({'status': "SUCCESS", 'data': {'campaign':detail_info}}, status=200)
-        
+            return JsonResponse({'status': "SUCCESS", 'data': {'campaign':detail_info}}, status=200)
+        except Campaign.DoesNotExist:
+            return JsonResponse({"status": "CAMPAIGN_NOT_FOUND", "message": "존재하지 않는 캠페인입니다."}, status=404)
+
 class UserCampaignDetailView(APIView):
     @swagger_auto_schema(
         manual_parameters=[openapi.Parameter('authorization', openapi.IN_HEADER, description="please enter login token", type=openapi.TYPE_STRING)]
@@ -116,7 +121,37 @@ class UserCampaignDetailView(APIView):
                 ]
             }
             return JsonResponse({'status': "SUCCESS", 'data': {'campaign':detail_info}}, status=200)
-            
         except Campaign.DoesNotExist:
             return JsonResponse({"status": "CAMPAIGN_NOT_FOUND", "message": "존재하지 않는 캠페인입니다."}, status=404)
         
+class PaymentRegisterView(APIView):
+    @swagger_auto_schema(
+        manual_parameters=[openapi.Parameter('authorization', openapi.IN_HEADER, description="please enter login token", type=openapi.TYPE_STRING)]
+    )
+    @authorization_decorator
+    def post(self, request):
+        user     = request.user
+        data     = json.loads(request.body)
+        option   = Option.objects.get(id=data['option'][0]['option_id'])
+        campaign = option.campaign
+        Payment.objects.create(
+            orderer_name     = data['orderer'],
+            orderer_contact  = data['orderer_contact'],
+            name             = data['recipient'],
+            phone_number     = data['recipient_contact'],
+            address          = data['address'],
+            payment_type     = data['payment'],
+            delivery_request = data['request'],
+            user_id          = user.id,
+            campaign_id      = campaign.id
+        )
+
+        for option in data['option']:
+            UserOption.objects.create(
+                title     = option['title'],
+                price     = option['price'],
+                quantity  = option['quantity'],
+                user_id   = user.id,
+                option_id = option['option_id']
+            )
+        return JsonResponse({"message": "SUCCESS"}, status=200)

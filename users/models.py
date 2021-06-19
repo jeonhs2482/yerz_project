@@ -22,6 +22,8 @@ class UserOption(models.Model):
         db_table = 'user_option'
 
 class Payment(models.Model):
+    orderer_name     = models.CharField(max_length=64, default='')
+    orderer_contact  = models.CharField(max_length=64, default='')
     name             = models.CharField(max_length=64)
     phone_number     = models.CharField(max_length=64)
     address          = models.CharField(max_length=128)
