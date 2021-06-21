@@ -9,6 +9,7 @@ from rest_framework.views  import APIView
 from utils.decorators      import authorization_decorator
 from users.models          import UserOption, Payment
 from campaigns.models      import Campaign, Option
+from .serializers          import PaymentRegisterSerializer
 
 class CampaignListView(APIView):
     @swagger_auto_schema(
@@ -23,7 +24,7 @@ class CampaignListView(APIView):
             'url'      : [payments.campaign.image, payments.campaign.image, payments.campaign.image],
             'subtitle' : {
                 'brand'   : payments.campaign.subtitle.brand,
-                'hostname': payments.campaign.subtitle.host
+                'host': payments.campaign.subtitle.host
             },
             'title'    : payments.campaign.title
         } for payments in user_payment]
@@ -37,7 +38,7 @@ class AllCampaignListView(APIView):
             'url'      : [campaigns.image, campaigns.image, campaigns.image],
             'subtitle' : {
                 'brand'   : campaigns.subtitle.brand,
-                'hostname': campaigns.subtitle.host
+                'host': campaigns.subtitle.host
             },
             'title'    : campaigns.title
         } for campaigns in all_campaign]
@@ -126,8 +127,8 @@ class UserCampaignDetailView(APIView):
         
 class PaymentRegisterView(APIView):
     @swagger_auto_schema(
-        manual_parameters=[openapi.Parameter('authorization', openapi.IN_HEADER, description="please enter login token", type=openapi.TYPE_STRING)]
-    )
+        manual_parameters=[openapi.Parameter('authorization', openapi.IN_HEADER, description="please enter login token", type=openapi.TYPE_STRING)], 
+        request_body=PaymentRegisterSerializer)
     @authorization_decorator
     def post(self, request):
         user     = request.user
