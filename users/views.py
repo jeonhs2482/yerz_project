@@ -39,6 +39,9 @@ class SignInView(APIView):
         except User.DoesNotExist: 
             return JsonResponse({"status": "INVALID_USER"}, status=401)
         
+# class ChangePasswordView(APIView):
+#     def post(self, request):
+#         pass
 
         
         

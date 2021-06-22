@@ -84,7 +84,6 @@ class UserCampaignDetailView(APIView):
             option_list     = []
             for payment_option in payment_options:
                 option_list.append(payment_option)
-            all_price    = [options.price for options in option_list]
             detail_info  = {
                 'id': payment.id,
                 'more': [
@@ -104,7 +103,7 @@ class UserCampaignDetailView(APIView):
                         'title' : "결제 정보",
                         'detail': {
                             'payment': payment.payment_type,
-                            'price'  : float(sum(all_price))
+                            'price'  : payment.total
                         }
                     },
                     {
@@ -139,6 +138,7 @@ class PaymentRegisterView(APIView):
             address          = data['address'],
             payment_type     = data['payment'],
             delivery_request = data['request'],
+            total            = data['total'],
             user_id          = user.id,
             option_id        = option.id
         )

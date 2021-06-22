@@ -28,6 +28,7 @@ class Payment(models.Model):
     address          = models.CharField(max_length=128)
     delivery_request = models.CharField(max_length=128)
     payment_type     = models.CharField(max_length=64, default='')
+    total            = models.IntegerField(default=0)
     created_at       = models.DateTimeField(auto_now_add=True)
     user             = models.ForeignKey('User', on_delete=models.CASCADE, related_name='user_payment')
     option           = models.ForeignKey('campaigns.Option', on_delete=models.CASCADE, related_name='option_payment', default=True)
