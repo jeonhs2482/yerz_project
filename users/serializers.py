@@ -10,4 +10,7 @@ class UserSerializer(serializers.ModelSerializer):
 class UserBodySerializer(serializers.Serializer):
     email    = serializers.CharField(help_text="아이디")
     password = serializers.CharField(help_text="비밀번호")
+
+class PasswordChangeSerializer(serializers.Serializer):
+    password = serializers.CharField(help_text="새로운 비밀번호")
     
