@@ -6,6 +6,7 @@ class User(models.Model):
     password     = models.CharField(max_length=64)
     name         = models.CharField(max_length=64)
     phone_number = models.CharField(max_length=64)
+    admin        = models.PositiveIntegerField(default=0)
     payment      = models.ManyToManyField('campaigns.Option', through='Payment')
 
     class Meta:

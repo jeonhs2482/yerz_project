@@ -23,8 +23,8 @@ class CampaignListView(APIView):
             'id'       : payments.id,
             'url'      : payments.option.campaign.image,
             'subtitle' : {
-                'brand' : payments.option.campaign.subtitle.brand,
-                'host'  : payments.option.campaign.subtitle.host
+                'brand' : payments.option.campaign.brand,
+                'host'  : payments.option.campaign.host
             },
             'title'    : payments.option.campaign.title
         } for payments in user_payment]
@@ -37,8 +37,8 @@ class AllCampaignListView(APIView):
             'id'       : campaigns.id,
             'url'      : campaigns.image,
             'subtitle' : {
-                'brand'   : campaigns.subtitle.brand,
-                'host': campaigns.subtitle.host
+                'brand'   : campaigns.brand,
+                'host': campaigns.host
             },
             'title'    : campaigns.title
         } for campaigns in all_campaign]
@@ -54,8 +54,8 @@ class CampaignDetailView(APIView):
                     'id'   : campaign.id,
                     'title': campaign.title,
                     'subtitle' : {
-                        'brand': campaign.subtitle.brand,
-                        'host' : campaign.subtitle.host
+                        'brand': campaign.brand,
+                        'host' : campaign.host
                     },
                     'url': campaign.image,
                     'option' : [{
@@ -70,6 +70,8 @@ class CampaignDetailView(APIView):
             return JsonResponse({'status': "SUCCESS", 'data': {'campaign':detail_info}}, status=200)
         except Campaign.DoesNotExist:
             return JsonResponse({"status": "CAMPAIGN_NOT_FOUND", "message": "존재하지 않는 캠페인입니다."}, status=404)
+        except KeyError: 
+            return JsonResponse({"status": "KEY_ERROR", "message": 'Key_Error'}, status=400)
 
 class UserCampaignDetailView(APIView):
     @swagger_auto_schema(
@@ -120,7 +122,8 @@ class UserCampaignDetailView(APIView):
             return JsonResponse({'status': "SUCCESS", 'data': {'campaign':detail_info}}, status=200)
         except Campaign.DoesNotExist:
             return JsonResponse({"status": "PAYMENT_NOT_FOUND", "message": "존재하지 않는 주문입니다."}, status=404)
-        
+        except KeyError: 
+            return JsonResponse({"status": "KEY_ERROR", "message": 'Key_Error'}, status=400)
 class PaymentRegisterView(APIView):
     @swagger_auto_schema(
         manual_parameters=[openapi.Parameter('authorization', openapi.IN_HEADER, description="please enter login token", type=openapi.TYPE_STRING)], 

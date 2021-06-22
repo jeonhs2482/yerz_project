@@ -1,16 +1,11 @@
 from django.db import models
 
-class SubTitle(models.Model):
-    brand = models.CharField(max_length=64)
-    host  = models.CharField(max_length=64)
-
-    class Meta:
-        db_table = 'subtitles'
-
 class Campaign(models.Model):
     image    = models.CharField(max_length=256)
     title    = models.CharField(max_length=64)
-    subtitle = models.ForeignKey('SubTitle', on_delete=models.CASCADE)
+    brand    = models.CharField(max_length=64)
+    host     = models.CharField(max_length=64)
+    user     = models.ForeignKey('users.User', on_delete=models.CASCADE, related_name='user_campaign')
 
     class Meta:
         db_table = 'campaigns'
