@@ -154,3 +154,64 @@ class PaymentRegisterView(APIView):
                 payment_id = payment.id
             )
         return JsonResponse({"message": "SUCCESS"}, status=200)
+
+class AdminCampaignListView(APIView):
+    @swagger_auto_schema(
+        manual_parameters=[openapi.Parameter('authorization', openapi.IN_HEADER, description="please enter login token", type=openapi.TYPE_STRING)]
+    )
+    @authorization_decorator
+    def get(self, request):
+        user          = request.user
+        user_campaign = Campaign.objects.filter(user_id=user.id)
+        campaign      = [{
+            'id'       : campaign.id,
+            'url'      : campaign.image,
+            'subtitle' : {
+                'brand': campaign.brand,
+                'host' : campaign.host
+            },
+            'title'    : campaign.title
+        } for campaign in user_campaign]
+        return JsonResponse({'status': "SUCCESS", 'data': {'campaign':campaign}}, status=200)
+
+class AdminCmapaignDetailView(APIView):
+    @swagger_auto_schema(
+        manual_parameters=[openapi.Parameter('authorization', openapi.IN_HEADER, description="please enter login token", type=openapi.TYPE_STRING)]
+    )
+    @authorization_decorator
+    def get(self, request, campaign_id):
+        try:
+            admin_payment   = Payment.objects.filter(option__campaign_id=campaign_id)
+            payment_options = PaymentOption.objects.filter(payment__option__campaign_id=campaign_id)
+            option_list     = []
+            for payment_option in payment_options:
+                option_list.append(payment_option)
+            detail_info  = [
+                {
+                'id': payment.id,
+                'info': {
+                    'orderer'          : payment.orderer_name,
+                    'orderer_contact'  : payment.orderer_contact,
+                    'recipient'        : payment.name,
+                    'recipient_contact': payment.phone_number,
+                    'address'          : payment.address,
+                    'option'           : [{
+                            'title'    : option.title,
+                            'quantity' : option.quantity
+                        }for option in option_list],
+                    'payment'          : payment.payment_type,
+                    'price'            : payment.total,
+                    'date'             : payment.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+                    'status'           : '결제완료' if payment.payment_type == '카드' else '입금대기중'
+                }
+            }
+                for payment in admin_payment]
+            return JsonResponse({'status': "SUCCESS", 'data': {'campaign':detail_info}}, status=200)
+        except Campaign.DoesNotExist:
+            return JsonResponse({"status": "CAMPAIGN_NOT_FOUND", "message": "존재하지 않는 캠페인입니다."}, status=404)
+        except KeyError: 
+            return JsonResponse({"status": "KEY_ERROR", "message": 'Key_Error'}, status=400)
+        
+
+
+    
