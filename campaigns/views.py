@@ -21,7 +21,7 @@ class CampaignListView(APIView):
         user_payment  = Payment.objects.filter(user_id=user.id).order_by('-created_at')
         campaign      = [{
             'id'       : payments.id,
-            'url'      : [payments.option.campaign.image, payments.option.campaign.image, payments.option.campaign.image],
+            'url'      : payments.option.campaign.image,
             'subtitle' : {
                 'brand' : payments.option.campaign.subtitle.brand,
                 'host'  : payments.option.campaign.subtitle.host
@@ -35,7 +35,7 @@ class AllCampaignListView(APIView):
         all_campaign  = Campaign.objects.all()
         campaign      = [{
             'id'       : campaigns.id,
-            'url'      : [campaigns.image, campaigns.image, campaigns.image],
+            'url'      : campaigns.image,
             'subtitle' : {
                 'brand'   : campaigns.subtitle.brand,
                 'host': campaigns.subtitle.host
@@ -57,9 +57,7 @@ class CampaignDetailView(APIView):
                         'brand': campaign.subtitle.brand,
                         'host' : campaign.subtitle.host
                     },
-                    'url': [
-                        campaign.image, campaign.image, campaign.image 
-                    ],
+                    'url': campaign.image,
                     'option' : [{
                         'option_id': option.id,
                         'title'    : option.title,
