@@ -1,6 +1,6 @@
 from django.urls  import path
 from campaigns.views  import (AllCampaignListView, UserCampaignDetailView, CampaignListView,
-                              CampaignDetailView, PaymentRegisterView, AdminCampaignListView, AdminCmapaignDetailView)
+                              CampaignDetailView, PaymentRegisterView, AdminCampaignListView, AdminCampaignDetailView)
 
 urlpatterns = [
     path('/userlist', CampaignListView.as_view()),
@@ -9,6 +9,6 @@ urlpatterns = [
     path('/detail/<int:campaign_id>', CampaignDetailView.as_view()),
     path('/pay', PaymentRegisterView.as_view()),
     path('/adminlist', AdminCampaignListView.as_view()),
-    path('/admindetail/<int:campaign_id>', AdminCmapaignDetailView.as_view())
+    path('/admindetail/<int:campaign_id>', AdminCampaignDetailView.as_view())
 ]
 

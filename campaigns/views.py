@@ -174,7 +174,7 @@ class AdminCampaignListView(APIView):
         } for campaign in user_campaign]
         return JsonResponse({'status': "SUCCESS", 'data': {'campaign':campaign}}, status=200)
 
-class AdminCmapaignDetailView(APIView):
+class AdminCampaignDetailView(APIView):
     @swagger_auto_schema(
         manual_parameters=[openapi.Parameter('authorization', openapi.IN_HEADER, description="please enter login token", type=openapi.TYPE_STRING)]
     )
