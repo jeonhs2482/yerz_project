@@ -18,7 +18,7 @@ class CampaignListView(APIView):
     @authorization_decorator
     def get(self, request):
         user          = request.user
-        user_payment  = Payment.objects.filter(user_id=user.id)
+        user_payment  = Payment.objects.filter(user_id=user.id).order_by('-created_at')
         campaign      = [{
             'id'       : payments.id,
             'url'      : [payments.option.campaign.image, payments.option.campaign.image, payments.option.campaign.image],
