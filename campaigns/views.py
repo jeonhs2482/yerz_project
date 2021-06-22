@@ -71,7 +71,7 @@ class CampaignDetailView(APIView):
         except Campaign.DoesNotExist:
             return JsonResponse({"status": "CAMPAIGN_NOT_FOUND", "message": "존재하지 않는 캠페인입니다."}, status=404)
         except KeyError: 
-            return JsonResponse({"status": "KEY_ERROR", "message": 'Key_Error'}, status=400)
+            return JsonResponse({"status": "KEY_ERROR", "message": 'KEY_ERROR'}, status=400)
 
 class UserCampaignDetailView(APIView):
     @swagger_auto_schema(
@@ -123,7 +123,7 @@ class UserCampaignDetailView(APIView):
         except Campaign.DoesNotExist:
             return JsonResponse({"status": "PAYMENT_NOT_FOUND", "message": "존재하지 않는 주문입니다."}, status=404)
         except KeyError: 
-            return JsonResponse({"status": "KEY_ERROR", "message": 'Key_Error'}, status=400)
+            return JsonResponse({"status": "KEY_ERROR", "message": 'KEY_ERROR'}, status=400)
 class PaymentRegisterView(APIView):
     @swagger_auto_schema(
         manual_parameters=[openapi.Parameter('authorization', openapi.IN_HEADER, description="please enter login token", type=openapi.TYPE_STRING)], 
@@ -181,11 +181,8 @@ class AdminCmapaignDetailView(APIView):
     @authorization_decorator
     def get(self, request, campaign_id):
         try:
-            admin_payment   = Payment.objects.filter(option__campaign_id=campaign_id)
-            payment_options = PaymentOption.objects.filter(payment__option__campaign_id=campaign_id)
-            option_list     = []
-            for payment_option in payment_options:
-                option_list.append(payment_option)
+            admin_payment   = Payment.objects.filter(option__campaign_id=campaign_id).order_by('-created_at')
+            
             detail_info  = [
                 {
                 'id': payment.id,
@@ -196,9 +193,9 @@ class AdminCmapaignDetailView(APIView):
                     'recipient_contact': payment.phone_number,
                     'address'          : payment.address,
                     'option'           : [{
-                            'title'    : option.title,
-                            'quantity' : option.quantity
-                        }for option in option_list],
+                            'title'    : payment.title,
+                            'quantity' : payment.quantity
+                        }for payment in payment.payment_option.all()],
                     'payment'          : payment.payment_type,
                     'price'            : payment.total,
                     'date'             : payment.created_at.strftime("%Y-%m-%d %H:%M:%S"),

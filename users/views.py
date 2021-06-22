@@ -84,11 +84,6 @@ class ChangePasswordView(APIView):
         user.password = new_password
         user.save()
 
-        return JsonResponse({"message": "SUCCESS"}, status=200)
+        return JsonResponse({"status": "SUCCESS"}, status=200)
 
-
-        
-        
-
-
-
+#class CheckPasswordView(APIView):
