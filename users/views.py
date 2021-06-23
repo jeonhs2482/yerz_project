@@ -94,7 +94,7 @@ class CheckPasswordView(APIView):
     def post(self, request):
         data     = json.loads(request.body)
         user     = request.user
-        password = data['password']
+        password = data['currentpassword']
 
         if user.password == password:
             return JsonResponse({"status": "SUCCESS"}, status=200)
