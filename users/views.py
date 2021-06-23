@@ -1,4 +1,4 @@
-import json, time, jwt
+import json, time, jwt      
 
 from django.http             import JsonResponse
 
@@ -86,4 +86,26 @@ class ChangePasswordView(APIView):
 
         return JsonResponse({"status": "SUCCESS"}, status=200)
 
-#class CheckPasswordView(APIView):
+class CheckPasswordView(APIView):
+    @swagger_auto_schema(
+        manual_parameters=[openapi.Parameter('authorization', openapi.IN_HEADER, description="please enter login token", type=openapi.TYPE_STRING)], 
+        request_body=PasswordChangeSerializer)
+    @authorization_decorator
+    def post(self, request):
+        data     = json.loads(request.body)
+        user     = request.user
+        password = data['password']
+
+        if user.password == password:
+            return JsonResponse({"status": "SUCCESS"}, status=200)
+        else:
+            return JsonResponse({"status": "INCORRECT_PASSWORD"}, status=401)
+
+class CheckEmailView(APIView):
+    @swagger_auto_schema(
+        manual_parameters=[openapi.Parameter('authorization', openapi.IN_HEADER, description="please enter login token", type=openapi.TYPE_STRING)])
+    @authorization_decorator
+    def get(self, request):
+        user = request.user
+
+        return JsonResponse({'status': "SUCCESS", 'email': user.email}, status=200)

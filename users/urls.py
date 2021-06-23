@@ -1,8 +1,10 @@
 from django.urls  import path
-from users.views  import SignInView, AdminSigninView ,ChangePasswordView
+from users.views  import SignInView, AdminSigninView ,ChangePasswordView, CheckPasswordView, CheckEmailView
 
 urlpatterns = [
     path('/signin', SignInView.as_view()),
     path('/admin', AdminSigninView.as_view()),
-    path('/password', ChangePasswordView.as_view())
+    path('/password', ChangePasswordView.as_view()),
+    path('/checkpassword', CheckPasswordView.as_view()),
+    path('/email', CheckEmailView.as_view())
 ]
