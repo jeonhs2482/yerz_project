@@ -101,11 +101,16 @@ class CheckPasswordView(APIView):
         else:
             return JsonResponse({"status": "INCORRECT_PASSWORD"}, status=401)
 
-class CheckEmailView(APIView):
+class CheckInformationView(APIView):
     @swagger_auto_schema(
         manual_parameters=[openapi.Parameter('authorization', openapi.IN_HEADER, description="please enter login token", type=openapi.TYPE_STRING)])
     @authorization_decorator
     def get(self, request):
         user = request.user
+        user_info = {
+            'email'       : user.email,
+            'name'        : user.name,
+            'phone_number': user.phone_number
+        }
 
-        return JsonResponse({'status': "SUCCESS", 'email': user.email}, status=200)
+        return JsonResponse({'status': "SUCCESS", 'data': user_info}, status=200)
