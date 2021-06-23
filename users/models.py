@@ -3,6 +3,7 @@ from django.db.models.deletion import SET_DEFAULT
 
 class User(models.Model):
     email        = models.CharField(max_length=64)
+    kakao_email  = models.CharField(max_length=64, default='')
     password     = models.CharField(max_length=64)
     name         = models.CharField(max_length=64)
     phone_number = models.CharField(max_length=64)

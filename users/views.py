@@ -1,13 +1,14 @@
-import json, time, jwt      
+import json, time, jwt, requests     
 
 from django.http             import JsonResponse
+from django.shortcuts        import redirect
 
 from rest_framework.views    import APIView
 from drf_yasg                import openapi
 from drf_yasg.utils          import swagger_auto_schema 
 
 from .models                 import User
-from yerz.settings           import SECRET_KEY, JWT_ALGORITHM, JWT_DURATION_SEC
+from yerz.settings           import SECRET_KEY, JWT_ALGORITHM, JWT_DURATION_SEC, KAKAO_REST_API_KEY
 from utils.decorators        import authorization_decorator
 from users.serializers       import UserBodySerializer
 from .serializers            import PasswordChangeSerializer
@@ -113,4 +114,28 @@ class CheckInformationView(APIView):
             'phone_number': user.phone_number
         }
 
-        return JsonResponse({'status': "SUCCESS", 'data': user_info}, status=200)
+        return JsonResponse({"status": "SUCCESS", "data": user_info}, status=200)
+
+class KakaoSigninView(APIView):
+    def get(self, request):
+        app_key = KAKAO_REST_API_KEY
+        redirect_uri = 'http://localhost:8000/users/signin/kakao/callback'
+        kakao_auth_api = 'https://kauth.kakao.com/oauth/authorize?response_type=code'
+        return redirect(
+            f'{kakao_auth_api}&client_id={app_key}&redirect_uri={redirect_uri}'
+        )
+
+class KakaoSignInCallBackView(APIView):
+    def get(self, request):
+        auth_code = request.GET.get('code')
+        kakao_token_api = 'https://kauth.kakao.com/oauth/token'
+        data = {
+            'grant_type'     : 'authorization_code',
+            'client_id'      : KAKAO_REST_API_KEY,
+            'redirection_uri': 'http://localhost:8000/users/signin/kakao/callback',
+            'code'           : auth_code
+        }
+
+        token_response = requests.post(kakao_token_api, data=data)
+
+        return JsonResponse({"token": token_response.json()})

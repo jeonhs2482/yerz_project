@@ -124,6 +124,7 @@ class UserCampaignDetailView(APIView):
             return JsonResponse({"status": "PAYMENT_NOT_FOUND", "message": "존재하지 않는 주문입니다."}, status=404)
         except KeyError: 
             return JsonResponse({"status": "KEY_ERROR", "message": 'KEY_ERROR'}, status=400)
+
 class PaymentRegisterView(APIView):
     @swagger_auto_schema(
         manual_parameters=[openapi.Parameter('authorization', openapi.IN_HEADER, description="please enter login token", type=openapi.TYPE_STRING)], 
@@ -153,7 +154,7 @@ class PaymentRegisterView(APIView):
                 quantity   = option['quantity'],
                 payment_id = payment.id
             )
-        return JsonResponse({"message": "SUCCESS"}, status=200)
+        return JsonResponse({"status": "SUCCESS"}, status=200)
 
 class AdminCampaignListView(APIView):
     @swagger_auto_schema(
