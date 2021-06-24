@@ -1,14 +1,14 @@
-import json, time, jwt, requests     
+import json, time, jwt  
 
 from django.http             import JsonResponse
-from django.shortcuts        import redirect
+#from django.shortcuts        import redirect
 
 from rest_framework.views    import APIView
 from drf_yasg                import openapi
 from drf_yasg.utils          import swagger_auto_schema 
 
 from .models                 import User
-from yerz.settings           import SECRET_KEY, JWT_ALGORITHM, JWT_DURATION_SEC, KAKAO_REST_API_KEY
+from yerz.settings           import SECRET_KEY, JWT_ALGORITHM, JWT_DURATION_SEC
 from utils.decorators        import authorization_decorator
 from users.serializers       import UserBodySerializer
 from .serializers            import PasswordChangeSerializer
