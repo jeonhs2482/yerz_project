@@ -2,7 +2,7 @@ import my_settings
 import os
 
 from pathlib     import Path
-from my_settings import KAKAO_REST_API_KEY, SECRET_KEY, DATABASES
+from my_settings import SECRET_KEY, DATABASES
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -120,7 +120,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 JWT_SECRET_KEY     = my_settings.JWT_SECRET_KEY
 JWT_DURATION_SEC   = my_settings.JWT_DURATION_SEC
 JWT_ALGORITHM      = my_settings.JWT_ALGORITHM
-KAKAO_REST_API_KEY = my_settings.KAKAO_REST_API_KEY
+#KAKAO_REST_API_KEY = my_settings.KAKAO_REST_API_KEY
 
 #REMOVE_APPEND_SLASH_WARNING
 APPEND_SLASH = False
