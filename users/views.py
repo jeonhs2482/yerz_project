@@ -116,26 +116,26 @@ class CheckInformationView(APIView):
 
         return JsonResponse({"status": "SUCCESS", "data": user_info}, status=200)
 
-class KakaoSigninView(APIView):
-    def get(self, request):
-        app_key = KAKAO_REST_API_KEY
-        redirect_uri = 'http://localhost:8000/users/signin/kakao/callback'
-        kakao_auth_api = 'https://kauth.kakao.com/oauth/authorize?response_type=code'
-        return redirect(
-            f'{kakao_auth_api}&client_id={app_key}&redirect_uri={redirect_uri}'
-        )
+# class KakaoSigninView(APIView):
+#     def get(self, request):
+#         app_key = KAKAO_REST_API_KEY
+#         redirect_uri = 'http://localhost:8000/users/signin/kakao/callback'
+#         kakao_auth_api = 'https://kauth.kakao.com/oauth/authorize?response_type=code'
+#         return redirect(
+#             f'{kakao_auth_api}&client_id={app_key}&redirect_uri={redirect_uri}'
+#         )
 
-class KakaoSignInCallBackView(APIView):
-    def get(self, request):
-        auth_code = request.GET.get('code')
-        kakao_token_api = 'https://kauth.kakao.com/oauth/token'
-        data = {
-            'grant_type'     : 'authorization_code',
-            'client_id'      : KAKAO_REST_API_KEY,
-            'redirection_uri': 'http://localhost:8000/users/signin/kakao/callback',
-            'code'           : auth_code
-        }
+# class KakaoSignInCallBackView(APIView):
+#     def get(self, request):
+#         auth_code = request.GET.get('code')
+#         kakao_token_api = 'https://kauth.kakao.com/oauth/token'
+#         data = {
+#             'grant_type'     : 'authorization_code',
+#             'client_id'      : KAKAO_REST_API_KEY,
+#             'redirection_uri': 'http://localhost:8000/users/signin/kakao/callback',
+#             'code'           : auth_code
+#         }
 
-        token_response = requests.post(kakao_token_api, data=data)
+#         token_response = requests.post(kakao_token_api, data=data)
 
-        return JsonResponse({"token": token_response.json()})
+#         return JsonResponse({"token": token_response.json()})

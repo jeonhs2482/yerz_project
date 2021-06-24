@@ -1,5 +1,5 @@
 from django.urls  import path
-from users.views  import SignInView, AdminSigninView ,ChangePasswordView, CheckPasswordView, CheckInformationView, KakaoSigninView, KakaoSignInCallBackView
+from users.views  import SignInView, AdminSigninView ,ChangePasswordView, CheckPasswordView, CheckInformationView
 
 urlpatterns = [
     path('/signin', SignInView.as_view()),
@@ -7,6 +7,6 @@ urlpatterns = [
     path('/password', ChangePasswordView.as_view()),
     path('/checkpassword', CheckPasswordView.as_view()),
     path('/info', CheckInformationView.as_view()),
-    path('/signin/kakao', KakaoSigninView.as_view()),
-    path('/signin/kakao/callback', KakaoSignInCallBackView.as_view())
+    #path('/signin/kakao', KakaoSigninView.as_view()),
+    #path('/signin/kakao/callback', KakaoSignInCallBackView.as_view())
 ]
