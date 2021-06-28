@@ -16,12 +16,12 @@ def authorization_decorator(func):
             return func(self, request, *args, **kwargs)
 
         except jwt.exceptions.DecodeError:
-            return JsonResponse({'message':'INVALID_TOKEN'},status=400)
+            return JsonResponse({'status':'INVALID_TOKEN'},status=400)
 
         except User.DoesNotExist:
-            return JsonResponse({'message':'INVALID_USER'},status=400)
+            return JsonResponse({'status':'INVALID_USER'},status=400)
 
         except jwt.exceptions.ExpiredSignatureError:
-            return JsonResponse({'message': 'EXPIRED_TOKEN'},status=400)
+            return JsonResponse({'status': 'EXPIRED_TOKEN'},status=400)
 
     return wrapper

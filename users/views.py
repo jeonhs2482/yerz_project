@@ -1,7 +1,6 @@
-import json, time, jwt  
+import json, time, jwt, requests
 
 from django.http             import JsonResponse
-#from django.shortcuts        import redirect
 
 from rest_framework.views    import APIView
 from drf_yasg                import openapi
@@ -116,26 +115,50 @@ class CheckInformationView(APIView):
 
         return JsonResponse({"status": "SUCCESS", "data": user_info}, status=200)
 
-# class KakaoSigninView(APIView):
-#     def get(self, request):
-#         app_key = KAKAO_REST_API_KEY
-#         redirect_uri = 'http://localhost:8000/users/signin/kakao/callback'
-#         kakao_auth_api = 'https://kauth.kakao.com/oauth/authorize?response_type=code'
-#         return redirect(
-#             f'{kakao_auth_api}&client_id={app_key}&redirect_uri={redirect_uri}'
-#         )
+class KakaoSigninView(APIView):
+    def post(self, request):
+        try:
+            data         = json.loads(request.body)
+            access_token = data['access_token']
+            response     = requests.get('https://kapi.kakao.com/v2/user/me', headers={"Authorization": f'Bearer ${access_token}'})
+            data         = response.json()
+            
+            if response.status_code != 200:
+                    return JsonResponse({"status": "API_ERROR", "message": data['msg']}, status=response.status_code)
 
-# class KakaoSignInCallBackView(APIView):
-#     def get(self, request):
-#         auth_code = request.GET.get('code')
-#         kakao_token_api = 'https://kauth.kakao.com/oauth/token'
-#         data = {
-#             'grant_type'     : 'authorization_code',
-#             'client_id'      : KAKAO_REST_API_KEY,
-#             'redirection_uri': 'http://localhost:8000/users/signin/kakao/callback',
-#             'code'           : auth_code
-#         }
+            username           = data['kakao_account']['profile']['nickname']
+            email              = data['kakao_account']['email']
 
-#         token_response = requests.post(kakao_token_api, data=data)
+            if (User.objects.filter(kakao_email = email).exists()):
+                user = User.objects.get(kakao_email = email)
 
-#         return JsonResponse({"token": token_response.json()})
+            else:
+                user = User.objects.create(
+                                            name          = username,
+                                            kakao_email   = email,
+                                        )
+            new_token = jwt.encode(
+                                        {
+                                            'user_id': user.id,
+                                            'iat'    : int(time.time()),
+                                            'exp'    : int(time.time()) + JWT_DURATION_SEC
+                                        }, 
+                                        SECRET_KEY, 
+                                        JWT_ALGORITHM
+                                    )
+            return JsonResponse({"status": "SUCCESS", "data": {"token": new_token}}, status=200)
+
+        except KeyError as e:
+            return JsonResponse({"status": "KEY_ERROR", "message": f'Key Error in Field "{e.args[0]}"'}, status=400)
+
+        except requests.exceptions.Timeout as e:
+            return JsonResponse({"status": "TIMEOUT_ERROR", "message": e.response.message}, status=e.response.status_code)
+
+        except requests.exceptions.ConnectionError as e:
+            return JsonResponse({"status": "CONNECTION_ERROR", "message": e.response.message}, status=e.response.status_code)
+
+        except requests.exceptions.HTTPError as e:
+            return JsonResponse({"status": "TIMEOUT_ERROR", "message": e.response.message}, status=e.response.status_code)
+
+        
+                                        
