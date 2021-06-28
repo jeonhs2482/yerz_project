@@ -5,6 +5,7 @@ class Campaign(models.Model):
     title    = models.CharField(max_length=64)
     brand    = models.CharField(max_length=64)
     host     = models.CharField(max_length=64)
+    is_liked = models.BooleanField(default=False)
     user     = models.ForeignKey('users.User', on_delete=models.CASCADE, related_name='user_campaign')
 
     class Meta:

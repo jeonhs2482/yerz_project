@@ -1,5 +1,6 @@
 from django.urls  import path
-from users.views  import SignInView, AdminSigninView ,ChangePasswordView, CheckPasswordView, CheckInformationView, KakaoSigninView
+from users.views  import (SignInView, AdminSigninView ,ChangePasswordView, CheckPasswordView,
+                          CheckInformationView, KakaoSigninView, UserLikeView)
 
 urlpatterns = [
     path('/signin', SignInView.as_view()),
@@ -8,4 +9,5 @@ urlpatterns = [
     path('/checkpassword', CheckPasswordView.as_view()),
     path('/info', CheckInformationView.as_view()),
     path('/signin/kakao', KakaoSigninView.as_view()),
+    path('/like/<int:campaign_id>', UserLikeView.as_view())
 ]

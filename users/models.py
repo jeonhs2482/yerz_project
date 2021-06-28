@@ -9,6 +9,7 @@ class User(models.Model):
     phone_number = models.CharField(max_length=64)
     admin        = models.PositiveIntegerField(default=0)
     payment      = models.ManyToManyField('campaigns.Option', through='Payment')
+    like         = models.ManyToManyField('campaigns.Campaign', through='Like', related_name='user_campaign')
 
     class Meta:
         db_table = 'users'
@@ -37,3 +38,10 @@ class Payment(models.Model):
     
     class Meta:
         db_table = 'payments'
+
+class Like(models.Model):
+    user     = models.ForeignKey('User', on_delete=models.CASCADE, related_name='liked_user')
+    campaign = models.ForeignKey('campaigns.Campaign', on_delete=models.CASCADE, related_name='liked_campaign')
+
+    class Meta:
+        db_table = 'likes' 

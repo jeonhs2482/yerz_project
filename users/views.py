@@ -6,7 +6,8 @@ from rest_framework.views    import APIView
 from drf_yasg                import openapi
 from drf_yasg.utils          import swagger_auto_schema 
 
-from .models                 import User
+from .models                 import User, Like
+from campaigns.models        import Campaign
 from yerz.settings           import SECRET_KEY, JWT_ALGORITHM, JWT_DURATION_SEC
 from utils.decorators        import authorization_decorator
 from users.serializers       import UserBodySerializer
@@ -159,6 +160,37 @@ class KakaoSigninView(APIView):
 
         except requests.exceptions.HTTPError as e:
             return JsonResponse({"status": "TIMEOUT_ERROR", "message": e.response.message}, status=e.response.status_code)
+
+class UserLikeView(APIView):
+    @swagger_auto_schema(
+        manual_parameters=[openapi.Parameter('authorization', openapi.IN_HEADER, description="please enter login token", type=openapi.TYPE_STRING)])
+    @authorization_decorator
+    def patch(self, request, campaign_id):
+        try:
+            user     = request.user
+            like     = Like.objects.filter(user_id=user.id, campaign_id=campaign_id)
+
+            if like:
+               liked = like[0]
+               campaign = liked.campaign
+               campaign.is_liked = False
+               campaign.save()
+               like.delete()
+
+               return JsonResponse({"status": "SUCCESS", "message": 'DELETE_CAMPAIGN_TO_LIKE'}, status=200)
+
+            else:
+                like = Like.objects.create(user_id=user.id, campaign_id=campaign_id)
+                campaign = like.campaign
+                campaign.is_liked = True
+                campaign.save()
+                
+                return JsonResponse({"status": "SUCCESS", "message": 'ADD_CAMPAIGN_FROM_LIKE'}, status=200) 
+
+        except Campaign.DoesNotExist:
+            return JsonResponse({"status": "CAMPAIGN_NOT_FOUND", "message": "존재하지 않는 캠페인입니다."}, status=404)
+            
+
 
         
                                         
