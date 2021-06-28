@@ -14,7 +14,7 @@ class Option(models.Model):
     title    = models.CharField(max_length=64)
     price    = models.IntegerField()
     quantity = models.PositiveSmallIntegerField(default=0)
-    campaign = models.ForeignKey('Campaign', on_delete=models.CASCADE)
+    campaign = models.ForeignKey('Campaign', on_delete=models.CASCADE, related_name='campaign_option')
 
     class Meta:
         db_table = 'options'

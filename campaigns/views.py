@@ -1,6 +1,7 @@
 import json
 
 from django.http           import JsonResponse
+from django.utils          import timezone
 
 from drf_yasg              import openapi
 from drf_yasg.utils        import swagger_auto_schema
@@ -209,7 +210,52 @@ class AdminCampaignDetailView(APIView):
             return JsonResponse({"status": "CAMPAIGN_NOT_FOUND", "message": "존재하지 않는 캠페인입니다."}, status=404)
         except KeyError: 
             return JsonResponse({"status": "KEY_ERROR", "message": 'Key_Error'}, status=400)
+
+class AllMontlySalesView(APIView):
+    @swagger_auto_schema(
+        manual_parameters=[openapi.Parameter('authorization', openapi.IN_HEADER, description="please enter login token", type=openapi.TYPE_STRING)]
+    )
+    @authorization_decorator
+    def get(self, request):
+        user          = request.user
+        user_campaign = Campaign.objects.filter(user_id=user.id)
+        current_time  = int(timezone.now().strftime('%m'))
+            
+        result = [
+            {
+                'id'  : campaign.id,
+                'name': campaign.brand,
+                'data': {
+                    'twoMonthsAgo': Payment.objects.filter(option__campaign_id=campaign.id, created_at__month=current_time-2).count(),
+                    'last'        : Payment.objects.filter(option__campaign_id=campaign.id, created_at__month=current_time-1).count(),
+                    'current'     : Payment.objects.filter(option__campaign_id=campaign.id, created_at__month=current_time).count()
+                }
+            }
+        for campaign in user_campaign]
+
+        return JsonResponse({'status': "SUCCESS", 'data': {'result':result}}, status=200)
+
+class MontlySalesView(APIView):
+    @swagger_auto_schema(
+        manual_parameters=[openapi.Parameter('authorization', openapi.IN_HEADER, description="please enter login token", type=openapi.TYPE_STRING)]
+    )
+    @authorization_decorator
+    def get(self, request, campaign_id):
+        campaign = Campaign.objects.get(id=campaign_id)
+        current_time  = int(timezone.now().strftime('%m'))
+
+        result = {
+                'id'  : campaign.id,
+                'name': campaign.brand,
+                'data': {
+                    'twoMonthsAgo': Payment.objects.filter(option__campaign_id=campaign.id, created_at__month=current_time-2).count(),
+                    'last'        : Payment.objects.filter(option__campaign_id=campaign.id, created_at__month=current_time-1).count(),
+                    'current'     : Payment.objects.filter(option__campaign_id=campaign.id, created_at__month=current_time).count()
+                }
+            }
         
+        return JsonResponse({'status': "SUCCESS", 'data': {'result':result}}, status=200)
+
 
 
     
