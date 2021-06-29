@@ -13,7 +13,7 @@ from utils.decorators        import authorization_decorator
 from users.serializers       import UserBodySerializer
 from .serializers            import PasswordChangeSerializer
 
-class SignInView(APIView):
+class SignInView(APIView):  #일반로그인
     @swagger_auto_schema(request_body=UserBodySerializer)
     def post(self, request):
         try:
@@ -41,7 +41,7 @@ class SignInView(APIView):
         except User.DoesNotExist: 
             return JsonResponse({"status": "INVALID_USER"}, status=401)
 
-class AdminSigninView(APIView):
+class AdminSigninView(APIView):  #어드민 계정 로그인
     @swagger_auto_schema(request_body=UserBodySerializer)
     def post(self, request):
         try:
@@ -72,7 +72,7 @@ class AdminSigninView(APIView):
         except User.DoesNotExist: 
             return JsonResponse({"status": "INVALID_USER"}, status=401)                      
 
-class ChangePasswordView(APIView):
+class ChangePasswordView(APIView):  #비밀번호 변경
     @swagger_auto_schema(
         manual_parameters=[openapi.Parameter('authorization', openapi.IN_HEADER, description="please enter login token", type=openapi.TYPE_STRING)], 
         request_body=PasswordChangeSerializer)
@@ -87,7 +87,7 @@ class ChangePasswordView(APIView):
 
         return JsonResponse({"status": "SUCCESS"}, status=200)
 
-class CheckPasswordView(APIView):
+class CheckPasswordView(APIView):  #현재 비밀번호 확인
     @swagger_auto_schema(
         manual_parameters=[openapi.Parameter('authorization', openapi.IN_HEADER, description="please enter login token", type=openapi.TYPE_STRING)], 
         request_body=PasswordChangeSerializer)
@@ -102,7 +102,7 @@ class CheckPasswordView(APIView):
         else:
             return JsonResponse({"status": "INCORRECT_PASSWORD"}, status=401)
 
-class CheckInformationView(APIView):
+class CheckInformationView(APIView):  #로그인한 유저 정보 확인
     @swagger_auto_schema(
         manual_parameters=[openapi.Parameter('authorization', openapi.IN_HEADER, description="please enter login token", type=openapi.TYPE_STRING)])
     @authorization_decorator
@@ -116,7 +116,7 @@ class CheckInformationView(APIView):
 
         return JsonResponse({"status": "SUCCESS", "data": user_info}, status=200)
 
-class KakaoSigninView(APIView):
+class KakaoSigninView(APIView):  #카카오 소셜로그인
     def post(self, request):
         try:
             data         = json.loads(request.body)
@@ -161,7 +161,7 @@ class KakaoSigninView(APIView):
         except requests.exceptions.HTTPError as e:
             return JsonResponse({"status": "TIMEOUT_ERROR", "message": e.response.message}, status=e.response.status_code)
 
-class UserLikeView(APIView):
+class UserLikeView(APIView):  #유저 좋아요 데이터
     @swagger_auto_schema(
         manual_parameters=[openapi.Parameter('authorization', openapi.IN_HEADER, description="please enter login token", type=openapi.TYPE_STRING)])
     @authorization_decorator
@@ -190,7 +190,7 @@ class UserLikeView(APIView):
         except Campaign.DoesNotExist:
             return JsonResponse({"status": "CAMPAIGN_NOT_FOUND", "message": "존재하지 않는 캠페인입니다."}, status=404)
 
-class UserLikeCampaignView(APIView):
+class UserLikeCampaignView(APIView):  #유저가 좋아요한 캠페인 확인
     @swagger_auto_schema(
         manual_parameters=[openapi.Parameter('authorization', openapi.IN_HEADER, description="please enter login token", type=openapi.TYPE_STRING)])
     @authorization_decorator

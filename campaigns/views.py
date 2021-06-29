@@ -12,7 +12,7 @@ from users.models          import PaymentOption, Payment, Like
 from campaigns.models      import Campaign, Option
 from .serializers          import PaymentRegisterSerializer
 
-class CampaignListView(APIView):
+class CampaignListView(APIView):  #로그인한 유저가 참여한 캠페인리스트
     @swagger_auto_schema(
         manual_parameters=[openapi.Parameter('authorization', openapi.IN_HEADER, description="please enter login token", type=openapi.TYPE_STRING)]
     )
@@ -32,7 +32,7 @@ class CampaignListView(APIView):
         } for payments in user_payment]
         return JsonResponse({'status': "SUCCESS", 'data': {'campaign':campaign}}, status=200)
 
-class AllCampaignListView(APIView):
+class AllCampaignListView(APIView):  #메인페이지 전체 캠페인리스트  
     @swagger_auto_schema(
         manual_parameters=[openapi.Parameter('authorization', openapi.IN_HEADER, description="please enter login token", type=openapi.TYPE_STRING)]
     )
@@ -52,7 +52,7 @@ class AllCampaignListView(APIView):
         } for campaigns in all_campaign]
         return JsonResponse({'status': "SUCCESS", 'data': {'campaign':campaign}}, status=200)
 
-class CampaignDetailView(APIView):
+class CampaignDetailView(APIView):  #캠페인 상세정보페이지
     def get(self, request, campaign_id):
         try:
             campaign        = Campaign.objects.get(id=campaign_id)
@@ -81,7 +81,7 @@ class CampaignDetailView(APIView):
         except KeyError: 
             return JsonResponse({"status": "KEY_ERROR", "message": 'KEY_ERROR'}, status=400)
 
-class UserCampaignDetailView(APIView):
+class UserCampaignDetailView(APIView):  #유저가 참여한 캠페인 주문정보페이지
     @swagger_auto_schema(
         manual_parameters=[openapi.Parameter('authorization', openapi.IN_HEADER, description="please enter login token", type=openapi.TYPE_STRING)]
     )
@@ -133,7 +133,7 @@ class UserCampaignDetailView(APIView):
         except KeyError: 
             return JsonResponse({"status": "KEY_ERROR", "message": 'KEY_ERROR'}, status=400)
 
-class PaymentRegisterView(APIView):
+class PaymentRegisterView(APIView):  #주문정보 입력페이지
     @swagger_auto_schema(
         manual_parameters=[openapi.Parameter('authorization', openapi.IN_HEADER, description="please enter login token", type=openapi.TYPE_STRING)], 
         request_body=PaymentRegisterSerializer)
@@ -164,7 +164,7 @@ class PaymentRegisterView(APIView):
             )
         return JsonResponse({"status": "SUCCESS"}, status=200)
 
-class AdminCampaignListView(APIView):
+class AdminCampaignListView(APIView):  #어드민 계정 로그인시 캠페인리스트 
     @swagger_auto_schema(
         manual_parameters=[openapi.Parameter('authorization', openapi.IN_HEADER, description="please enter login token", type=openapi.TYPE_STRING)]
     )
@@ -184,7 +184,7 @@ class AdminCampaignListView(APIView):
         } for campaign in user_campaign]
         return JsonResponse({'status': "SUCCESS", 'data': {'campaign':campaign}}, status=200)
 
-class AdminCampaignDetailView(APIView):
+class AdminCampaignDetailView(APIView):  #어드민 계정 로그인시 캠페인 상세정보페이지
     @swagger_auto_schema(
         manual_parameters=[openapi.Parameter('authorization', openapi.IN_HEADER, description="please enter login token", type=openapi.TYPE_STRING)]
     )
@@ -219,7 +219,7 @@ class AdminCampaignDetailView(APIView):
         except KeyError: 
             return JsonResponse({"status": "KEY_ERROR", "message": 'Key_Error'}, status=400)
 
-class AllMontlySalesView(APIView):
+class AllMontlySalesView(APIView):  #어드민 계정 로그인시 캠페인별 최근 3개월 판매량
     @swagger_auto_schema(
         manual_parameters=[openapi.Parameter('authorization', openapi.IN_HEADER, description="please enter login token", type=openapi.TYPE_STRING)]
     )
@@ -243,7 +243,7 @@ class AllMontlySalesView(APIView):
 
         return JsonResponse({'status': "SUCCESS", 'data': {'result':result}}, status=200)
 
-class MontlySalesView(APIView):
+class MontlySalesView(APIView):  #어드민 계정 로그인시 옵션별 최근 3개월 판매량
     @swagger_auto_schema(
         manual_parameters=[openapi.Parameter('authorization', openapi.IN_HEADER, description="please enter login token", type=openapi.TYPE_STRING)]
     )
