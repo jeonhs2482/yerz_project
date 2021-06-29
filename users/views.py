@@ -189,6 +189,31 @@ class UserLikeView(APIView):
 
         except Campaign.DoesNotExist:
             return JsonResponse({"status": "CAMPAIGN_NOT_FOUND", "message": "존재하지 않는 캠페인입니다."}, status=404)
+
+class UserLikeCampaignView(APIView):
+    @swagger_auto_schema(
+        manual_parameters=[openapi.Parameter('authorization', openapi.IN_HEADER, description="please enter login token", type=openapi.TYPE_STRING)])
+    @authorization_decorator
+    def get(self, request):
+        user           = request.user
+        liked_campaign = Like.objects.filter(user_id=user.id)
+
+        campaign      = [{
+            'id'       : campaigns.campaign.id,
+            'url'      : campaigns.campaign.image,
+            'subtitle' : {
+                'brand'   : campaigns.campaign.brand,
+                'host': campaigns.campaign.host
+            },
+            'title'    : campaigns.campaign.title,
+            'is_liked' : user in campaigns.campaign.user_campaign.all()
+        } for campaigns in liked_campaign]
+
+        return JsonResponse({'status': "SUCCESS", 'data': {'campaign':campaign}}, status=200)
+                
+          
+                
+
             
 
 

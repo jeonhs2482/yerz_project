@@ -27,7 +27,8 @@ class CampaignListView(APIView):
                 'brand' : payments.option.campaign.brand,
                 'host'  : payments.option.campaign.host
             },
-            'title'    : payments.option.campaign.title
+            'title'    : payments.option.campaign.title,
+            'is_liked' : user in payments.option.campaign.user_campaign.all()
         } for payments in user_payment]
         return JsonResponse({'status': "SUCCESS", 'data': {'campaign':campaign}}, status=200)
 
@@ -178,7 +179,8 @@ class AdminCampaignListView(APIView):
                 'brand': campaign.brand,
                 'host' : campaign.host
             },
-            'title'    : campaign.title
+            'title'    : campaign.title,
+            'is_liked' : user in campaign.user_campaign.all()
         } for campaign in user_campaign]
         return JsonResponse({'status': "SUCCESS", 'data': {'campaign':campaign}}, status=200)
 
@@ -232,9 +234,9 @@ class AllMontlySalesView(APIView):
                 'id'  : campaign.id,
                 'name': campaign.brand,
                 'data': {
-                    'twoMonthsAgo': Payment.objects.filter(option__campaign_id=campaign.id, created_at__month=current_time-2).count(),
-                    'last'        : Payment.objects.filter(option__campaign_id=campaign.id, created_at__month=current_time-1).count(),
-                    'current'     : Payment.objects.filter(option__campaign_id=campaign.id, created_at__month=current_time).count()
+                    'twoMonthsAgo': sum([num.quantity for num in PaymentOption.objects.filter(payment__option__campaign_id=campaign.id, payment__created_at__month=current_time-2)]),
+                    'last'        : sum([num.quantity for num in PaymentOption.objects.filter(payment__option__campaign_id=campaign.id, payment__created_at__month=current_time-1)]),
+                    'current'     : sum([num.quantity for num in PaymentOption.objects.filter(payment__option__campaign_id=campaign.id, payment__created_at__month=current_time)])
                 }
             }
         for campaign in user_campaign]
@@ -248,18 +250,20 @@ class MontlySalesView(APIView):
     @authorization_decorator
     def get(self, request, campaign_id):
         campaign = Campaign.objects.get(id=campaign_id)
+        options   = Option.objects.filter(campaign__id=campaign.id)
         current_time  = int(timezone.now().strftime('%m'))
 
-        result = {
-                'id'  : campaign.id,
-                'name': campaign.brand,
+        result = [
+            {
+                'id'  : option.id,
+                'name': option.title,
                 'data': {
-                    'twoMonthsAgo': Payment.objects.filter(option__campaign_id=campaign.id, created_at__month=current_time-2).count(),
-                    'last'        : Payment.objects.filter(option__campaign_id=campaign.id, created_at__month=current_time-1).count(),
-                    'current'     : Payment.objects.filter(option__campaign_id=campaign.id, created_at__month=current_time).count()
+                    'twoMonthsAgo': sum([num.quantity for num in PaymentOption.objects.filter(payment__option__id=option.id, payment__created_at__month=current_time-2)]),
+                    'last'        : sum([num.quantity for num in PaymentOption.objects.filter(payment__option__id=option.id, payment__created_at__month=current_time-1)]),
+                    'current'     : sum([num.quantity for num in PaymentOption.objects.filter(payment__option__id=option.id, payment__created_at__month=current_time)])
                 }
             }
-        
+        for option in options]
         return JsonResponse({'status': "SUCCESS", 'data': {'result':result}}, status=200)
 
 

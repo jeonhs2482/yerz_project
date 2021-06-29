@@ -1,4 +1,4 @@
-from django.urls  import path
+from django.urls      import path
 from campaigns.views  import (AllCampaignListView, UserCampaignDetailView, CampaignListView, AllMontlySalesView, MontlySalesView,
                               CampaignDetailView, PaymentRegisterView, AdminCampaignListView, AdminCampaignDetailView)
 
