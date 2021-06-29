@@ -249,18 +249,18 @@ class MontlySalesView(APIView):
     )
     @authorization_decorator
     def get(self, request, campaign_id):
-        campaign = Campaign.objects.get(id=campaign_id)
-        options   = Option.objects.filter(campaign__id=campaign.id)
-        current_time  = int(timezone.now().strftime('%m'))
+        campaign     = Campaign.objects.get(id=campaign_id)
+        options      = Option.objects.filter(campaign__id=campaign.id)
+        current_time = int(timezone.now().strftime('%m'))
 
         result = [
             {
                 'id'  : option.id,
                 'name': option.title,
                 'data': {
-                    'twoMonthsAgo': sum([num.quantity for num in PaymentOption.objects.filter(payment__option__id=option.id, payment__created_at__month=current_time-2)]),
-                    'last'        : sum([num.quantity for num in PaymentOption.objects.filter(payment__option__id=option.id, payment__created_at__month=current_time-1)]),
-                    'current'     : sum([num.quantity for num in PaymentOption.objects.filter(payment__option__id=option.id, payment__created_at__month=current_time)])
+                    'twoMonthsAgo': sum([num.quantity for num in PaymentOption.objects.filter(title=option.title, payment__created_at__month=current_time-2)]),
+                    'last'        : sum([num.quantity for num in PaymentOption.objects.filter(title=option.title, payment__created_at__month=current_time-1)]),
+                    'current'     : sum([num.quantity for num in PaymentOption.objects.filter(title=option.title, payment__created_at__month=current_time)])
                 }
             }
         for option in options]
