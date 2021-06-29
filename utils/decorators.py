@@ -25,3 +25,24 @@ def authorization_decorator(func):
             return JsonResponse({'status': 'EXPIRED_TOKEN'},status=400)
 
     return wrapper
+
+def chekuser_decorator(func):
+    def wrapper(self, request, *args, **kwargs):
+        access_token    =   request.headers.get('Authorization', None)
+        try:
+            if access_token:
+                payload         =   jwt.decode(access_token.encode('utf-8'), SECRET_KEY , JWT_ALGORITHM)
+                login_user      =   User.objects.get(id=payload['user_id'])
+                request.user    =   login_user
+                return func(self, request, *args, **kwargs)
+
+            else:
+                request.user = None
+                return func(self, request, *args, **kwargs)
+            
+        except:
+            request.user = None
+            return func(self, request, *args, **kwargs)
+    
+    return wrapper
+

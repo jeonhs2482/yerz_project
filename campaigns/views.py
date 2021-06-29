@@ -7,8 +7,8 @@ from drf_yasg              import openapi
 from drf_yasg.utils        import swagger_auto_schema
 from rest_framework.views  import APIView
 
-from utils.decorators      import authorization_decorator
-from users.models          import PaymentOption, Payment
+from utils.decorators      import authorization_decorator, chekuser_decorator
+from users.models          import PaymentOption, Payment, Like
 from campaigns.models      import Campaign, Option
 from .serializers          import PaymentRegisterSerializer
 
@@ -32,7 +32,12 @@ class CampaignListView(APIView):
         return JsonResponse({'status': "SUCCESS", 'data': {'campaign':campaign}}, status=200)
 
 class AllCampaignListView(APIView):
+    @swagger_auto_schema(
+        manual_parameters=[openapi.Parameter('authorization', openapi.IN_HEADER, description="please enter login token", type=openapi.TYPE_STRING)]
+    )
+    @chekuser_decorator
     def get(self,request):
+        user          = request.user
         all_campaign  = Campaign.objects.all()
         campaign      = [{
             'id'       : campaigns.id,
@@ -41,7 +46,8 @@ class AllCampaignListView(APIView):
                 'brand'   : campaigns.brand,
                 'host': campaigns.host
             },
-            'title'    : campaigns.title
+            'title'    : campaigns.title,
+            'is_liked' : user in campaigns.user_campaign.all()
         } for campaigns in all_campaign]
         return JsonResponse({'status': "SUCCESS", 'data': {'campaign':campaign}}, status=200)
 
