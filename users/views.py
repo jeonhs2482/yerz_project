@@ -177,7 +177,7 @@ class UserLikeView(APIView):
                campaign.save()
                like.delete()
 
-               return JsonResponse({"status": "SUCCESS", "message": 'DELETE_CAMPAIGN_TO_LIKE'}, status=200)
+               return JsonResponse({"status": "SUCCESS", "is_liked": campaign.is_liked}, status=200)
 
             else:
                 like = Like.objects.create(user_id=user.id, campaign_id=campaign_id)
@@ -185,7 +185,7 @@ class UserLikeView(APIView):
                 campaign.is_liked = True
                 campaign.save()
                 
-                return JsonResponse({"status": "SUCCESS", "message": 'ADD_CAMPAIGN_FROM_LIKE'}, status=200) 
+                return JsonResponse({"status": "SUCCESS", "is_liked": campaign.is_liked}, status=200) 
 
         except Campaign.DoesNotExist:
             return JsonResponse({"status": "CAMPAIGN_NOT_FOUND", "message": "존재하지 않는 캠페인입니다."}, status=404)
