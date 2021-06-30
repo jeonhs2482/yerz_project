@@ -108,11 +108,18 @@ class CheckInformationView(APIView):  #로그인한 유저 정보 확인
     @authorization_decorator
     def get(self, request):
         user = request.user
-        user_info = {
-            'email'       : user.email,
-            'name'        : user.name,
-            'phone_number': user.phone_number
-        }
+        if user.kakao_email:
+            user_info = {
+                'email'       : user.kakao_email,
+                'name'        : user.name,
+                'phone_number': user.phone_number
+            }
+        else:
+            user_info = {
+                'email'       : user.email,
+                'name'        : user.name,
+                'phone_number': user.phone_number
+            }
 
         return JsonResponse({"status": "SUCCESS", "data": user_info}, status=200)
 
