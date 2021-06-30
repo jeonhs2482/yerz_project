@@ -266,6 +266,19 @@ class MontlySalesView(APIView):  #어드민 계정 로그인시 옵션별 최근
         for option in options]
         return JsonResponse({'status': "SUCCESS", 'data': {'result':result}}, status=200)
 
+class CampaignTotalView(APIView):  #캠페인 총 판매금액 및 주문자 수 정보
+    def get(self, request, campaign_id):
+        campaign      = Campaign.objects.get(id=campaign_id)
+        total_payment = Payment.objects.filter(option__campaign__id=campaign_id)
+
+        result = {
+            'id'         : campaign.id,
+            'total_price': sum([payment.total for payment in total_payment]),
+            'total_num'  : total_payment.count() 
+        }
+        return JsonResponse({'status': "SUCCESS", 'data': {'result':result}}, status=200)  
+        
+
 
 
     
